@@ -210,13 +210,29 @@ class User {
   }
 
   //adding favorite story to empty favorite array
-  async addFavorite(story){
+  async addFavorite(story) {
+    this.favorites.push(story);
     const token = this.loginToken;
-    const response = await axios({
+    await axios({
       method: "POST",
       url: `${BASE_URL}/users/${this.username}/favorites/${story.storyId}`,
-      data: { token },
-    });
-    this.favorites.push(story);
+      data: {token},
+    });  
   }
+
+  async removeFavorite(story) {
+    const token = this.loginToken;
+    this.favorites = this.favorites.filter(element => element.storyId !== element.storyId);
+    await axios({
+      method: "DELETE",
+      url: `${BASE_URL}/users/${this.username}/favorites/${story.storyId}`,
+      data: {token}
+    })
+  }
+
+  isFavorite(story) {
+   return this.favorites.some(storie => (storie.storyId == storie.storyId));
+  }
+
+ 
 }

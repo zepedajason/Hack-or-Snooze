@@ -21,10 +21,21 @@ async function getAndShowStoriesOnStart() {
 
 function generateStoryMarkup(story) {
   // console.debug("generateStoryMarkup", story);
-
+  // update when there is no user connected, no star shown
+  // When the user is authenticated, you should display either a full or empty star depending on whether it's a favorite or not. You can write a separate function to handle that logic
   const hostName = story.getHostName();
+
+  let star = "";
+  if (currentUser){
+    star = `<span class="star">
+    <i class="far fa-star"></i>
+  </span>`;
+  }
+  //check if story is favorite or not
+
   return $(`
       <li id="${story.storyId}">
+        ${star}
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
         </a>
@@ -35,6 +46,11 @@ function generateStoryMarkup(story) {
     `);
 }
 
+function checkIfFavorite(user, story) {
+  if(user.isFavorite(story) == true){
+    console.log(true);
+  }
+}
 /** Gets list of stories from server, generates their HTML, and puts on page. */
 
 function putStoriesOnPage() {
@@ -73,6 +89,37 @@ async function addUserSubmittedStory(evt){
 
 $submitForm.on("submit", addUserSubmittedStory);
 
-async function selectFavorite(evt) {
-  console.log(evt);
+function showFavorites() {
+  $favoriteStories.empty();
+  // currentUser.favorites.forEach(element => {
+  //   const story = generateStoryMarkup(element);
+  //   $favoriteStories.append(story)
+  //  });
+  for (let story of currentUser.favorites) {
+    const $story = generateStoryMarkup(story);
+    $favoriteStories.append($story);
+  }
+
+$favoriteStories.show();
 }
+
+async function selectFavorite(evt) {
+  //check based on list of user favorites
+  //think of how to perform differation in list
+  //call function to select favorite
+  //after function update story list
+  const target = $(evt.target);
+  const story = storyList.stories.find(element => element.storyId === element.storyId);
+
+  if(target.hasClass("far")){
+    await currentUser.addFavorite(story);
+    console.log("added to favorites");
+    target.closest("i").attr("class", "fas fa-star");
+  } else if(target.hasClass("fas")){
+    await currentUser.removeFavorite(story);
+    console.log("removed from favorites")
+    target.closest("i").attr("class", "far fa-star");
+  }
+}
+
+$allStoriesList.on("click", ".star", selectFavorite);

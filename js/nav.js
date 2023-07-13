@@ -41,3 +41,11 @@ function showSubmitStoryForm() {
 }
 
 $submitStory.on("click", showSubmitStoryForm);
+
+function displayFavorites() {
+  alert("showing favorites");
+  hidePageComponents();
+  showFavorites();
+}
+
+$favorites.on("click", displayFavorites);
